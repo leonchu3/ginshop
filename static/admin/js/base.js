@@ -13,7 +13,7 @@ var baseApp={
 			$(this).siblings('ul').slideToggle();
 		}) 
     },
-    //设置iframe的高度
+    //设置iframe的高度 
 	resizeIframe:function(){					
 		$("#rightMain").height($(window).height()-80)
 	},

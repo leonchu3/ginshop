@@ -22,7 +22,7 @@ func (con RoleController) Index(c *gin.Context) {
 }
 
 func (con RoleController) Add(c *gin.Context) {
-	c.HTML(200, "admin/role/add.html", gin.H{})
+	c.HTML(http.StatusOK, "admin/role/add.html", gin.H{})
 }
 
 func (con RoleController) DoAdd(c *gin.Context) {
@@ -67,7 +67,7 @@ func (con RoleController) DoEdit(c *gin.Context) {
 		if err2 != nil {
 			con.Error(c, "修改数据失败", "/admin/role/edit?id="+models.String(id))
 		} else {
-			con.Success(c, "修改数据成功", "/admin/role/edit?id="+models.String(id))
+			con.Success(c, "修改数据成功", "/admin/role")
 		}
 	}
 }

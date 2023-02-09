@@ -23,7 +23,9 @@ func AdminRoutersInit(r *gin.Engine) {
 
 	adminRouters.GET("/manager", admin.ManagerController{}.Index)
 	adminRouters.GET("/manager/add", admin.ManagerController{}.Add)
+	adminRouters.POST("/manager/doAdd", admin.ManagerController{}.DoAdd)
 	adminRouters.GET("/manager/edit", admin.ManagerController{}.Edit)
+	adminRouters.POST("/manager/doEdit", admin.ManagerController{}.DoEdit)
 	adminRouters.GET("/manager/delete", admin.ManagerController{}.Delete)
 
 	adminRouters.GET("/focus", admin.FocusController{}.Index)
@@ -38,4 +40,10 @@ func AdminRoutersInit(r *gin.Engine) {
 	adminRouters.POST("/role/doAdd", admin.RoleController{}.DoAdd)
 	adminRouters.POST("/role/doEdit", admin.RoleController{}.DoEdit)
 
+	adminRouters.GET("/access", admin.AccessController{}.Index)
+	adminRouters.GET("/access/add", admin.AccessController{}.Add)
+	adminRouters.POST("/access/doAdd", admin.AccessController{}.DoAdd)
+	adminRouters.GET("/access/edit", admin.AccessController{}.Edit)
+	adminRouters.POST("/access/doEdit", admin.AccessController{}.DoEdit)
+	adminRouters.GET("/access/delete", admin.AccessController{}.Delete)
 }
