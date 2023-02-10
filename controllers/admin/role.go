@@ -95,3 +95,63 @@ func (con RoleController) Delete(c *gin.Context) {
 		con.Success(c, "删除数据成功", "/admin/role")
 	}
 }
+
+func (con RoleController) Auth(c *gin.Context) {
+	// 获取角色id
+	id, err := models.Int(c.Query("id"))
+	if err != nil {
+		con.Error(c, "删除数据错误", "/admin/role")
+		return
+	}
+
+	// 获取所有的权限
+	accessList := []models.Access{}
+	models.DB.Where("module_id=?", 0).Preload("AccessItem").Find(&accessList)
+
+	//获取当前角色拥有的权限， 并把权限id放在一个map对象里面
+
+	roleAccess := []models.RoleAccess{}
+	models.DB.Where("role_id=?", id).Find(&roleAccess)
+	roleAccessMap := make(map[int]int)
+	for _, v := range roleAccess {
+		roleAccessMap[v.AccessId] = v.AccessId
+	}
+
+	for i := 0; i < len(accessList); i++ {
+		if _, ok := roleAccessMap[accessList[i].Id]; ok {
+			accessList[i].Checked = true
+		}
+		for j := 0; j < len(accessList[i].AccessItem); j++ {
+			if _, ok := roleAccessMap[accessList[i].AccessItem[j].Id]; ok {
+				accessList[i].AccessItem[j].Checked = true
+			}
+		}
+	}
+
+	c.HTML(http.StatusOK, "admin/role/auth.html", gin.H{
+		"roleId":     id,
+		"accessList": accessList,
+	})
+}
+
+func (con RoleController) DoAuth(c *gin.Context) {
+	roleId, err := models.Int(c.PostForm("role_id"))
+	if err != nil {
+		con.Error(c, "传入数据错误", "/admin/role")
+		return
+	}
+	// 获取权限id 切片[]
+	accessIds := c.PostFormArray("access_node[]")
+
+	//增加当前角色对应的权限数据
+	roleAcces := models.RoleAccess{}
+	models.DB.Where("role_id=?", roleId).Delete(&roleAcces)
+	for _, v := range accessIds {
+		roleAcces.RoleId = roleId
+		accessId, _ := models.Int(v)
+		roleAcces.AccessId = accessId
+		models.DB.Create(&roleAcces)
+	}
+
+	con.Success(c, "授权成功", "/admin/role/auth?id="+models.String(roleId))
+}

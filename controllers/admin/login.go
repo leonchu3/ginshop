@@ -15,7 +15,6 @@ type LoginController struct {
 }
 
 func (con LoginController) Index(c *gin.Context) {
-	fmt.Println(models.Md5("123456"))
 	c.HTML(200, "admin/login/login.html", gin.H{})
 }
 

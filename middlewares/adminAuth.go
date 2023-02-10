@@ -4,16 +4,34 @@ import (
 	"encoding/json"
 	"fmt"
 	"ginshop/models"
+	"os"
 	"strings"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"gopkg.in/ini.v1"
 )
 
 func judgeRedirect(c *gin.Context, pathname string) {
 	if pathname != "/admin/login" && pathname != "/admin/doLogin" && pathname != "/admin/captcha" {
 		c.Redirect(302, "/admin/login")
 	}
+}
+
+func excludeAuthPath(urlPath string) bool {
+	config, err := ini.Load("./conf/app.ini")
+	if err != nil {
+		fmt.Printf("Fail to read file: %v", err)
+		os.Exit(1)
+	}
+	excludeAuthPath := config.Section("").Key("excludeAuthPath").String()
+	excludeAuthPathSlice := strings.Split(excludeAuthPath, ",")
+	for _, v := range excludeAuthPathSlice {
+		if v == urlPath {
+			return true
+		}
+	}
+	return false
 }
 
 func InitAdminAuthMiddleware(c *gin.Context) {
@@ -50,10 +68,31 @@ func InitAdminAuthMiddleware(c *gin.Context) {
 	if ok {
 		//判断userinfo里面的信息是否存在
 		var userinfoStruct []models.Manager
+		// err := json.Unmarshal([]byte(userinfoStr), &userinfoStruct)
 		err := json.Unmarshal([]byte(userinfoStr), &userinfoStruct)
 
 		if err != nil || !(len(userinfoStruct) > 0 && userinfoStruct[0].Username != "") {
 			judgeRedirect(c, pathname)
+		} else {
+			urlPath := strings.Replace(pathname, "/admin/", "", 1)
+			if userinfoStruct[0].IsSuper == 0 && !excludeAuthPath("/"+urlPath) {
+				//1 根据角色获取当前角色的权限列表 然后把权限id放在一个map类型的对象里面
+
+				roleAccess := []models.RoleAccess{}
+				models.DB.Where("role_id=?", userinfoStruct[0].RoleId).Find(&roleAccess)
+				roleAccessMap := make(map[int]int)
+				for _, v := range roleAccess {
+					roleAccessMap[v.AccessId] = v.AccessId
+				}
+				//2 获取当前访问的url对应的权限id 判断权限id是否在角色对应的权限
+				access := models.Access{}
+				models.DB.Where("url=?", urlPath).Find(&access)
+
+				if _, ok := roleAccessMap[access.Id]; !ok {
+					c.String(200, "没有权限")
+					c.Abort()
+				}
+			}
 		}
 
 	} else {

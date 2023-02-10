@@ -39,6 +39,8 @@ func AdminRoutersInit(r *gin.Engine) {
 	adminRouters.GET("/role/delete", admin.RoleController{}.Delete)
 	adminRouters.POST("/role/doAdd", admin.RoleController{}.DoAdd)
 	adminRouters.POST("/role/doEdit", admin.RoleController{}.DoEdit)
+	adminRouters.GET("/role/auth", admin.RoleController{}.Auth)
+	adminRouters.POST("/role/doAuth", admin.RoleController{}.DoAuth)
 
 	adminRouters.GET("/access", admin.AccessController{}.Index)
 	adminRouters.GET("/access/add", admin.AccessController{}.Add)
@@ -46,4 +48,5 @@ func AdminRoutersInit(r *gin.Engine) {
 	adminRouters.GET("/access/edit", admin.AccessController{}.Edit)
 	adminRouters.POST("/access/doEdit", admin.AccessController{}.DoEdit)
 	adminRouters.GET("/access/delete", admin.AccessController{}.Delete)
+
 }
