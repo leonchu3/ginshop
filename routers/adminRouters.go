@@ -74,4 +74,25 @@ func AdminRoutersInit(r *gin.Engine) {
 	adminRouters.POST("/goodsTypeAttribute/doEdit", admin.GoodsTypeAttributeController{}.DoEdit)
 	adminRouters.GET("/goodsTypeAttribute/delete", admin.GoodsTypeAttributeController{}.Delete)
 
+	adminRouters.GET("/goods", admin.GoodsController{}.Index)
+	adminRouters.GET("/goods/add", admin.GoodsController{}.Add)
+	adminRouters.GET("/goods/delete", admin.GoodsController{}.Delete)
+
+	adminRouters.POST("/goods/doAdd", admin.GoodsController{}.DoAdd)
+	adminRouters.GET("/goods/edit", admin.GoodsController{}.Edit)
+	adminRouters.POST("/goods/doEdit", admin.GoodsController{}.DoEdit)
+	adminRouters.GET("/goods/goodsTypeAttribute", admin.GoodsController{}.GoodsTypeAttribute)
+	adminRouters.POST("/goods/imageUpload", admin.GoodsController{}.ImageUpload)
+	adminRouters.GET("/goods/changeGoodsImageColor", admin.GoodsController{}.ChangeGoodsImageColor)
+	adminRouters.GET("/goods/removeGoodsImage", admin.GoodsController{}.RemoveGoodsImage)
+
+	adminRouters.GET("/nav", admin.NavController{}.Index)
+	adminRouters.GET("/nav/add", admin.NavController{}.Add)
+	adminRouters.POST("/nav/doAdd", admin.NavController{}.DoAdd)
+	adminRouters.GET("/nav/edit", admin.NavController{}.Edit)
+	adminRouters.POST("/nav/doEdit", admin.NavController{}.DoEdit)
+	adminRouters.GET("/nav/delete", admin.NavController{}.Delete)
+
+	adminRouters.GET("/setting", admin.SettingController{}.Index)
+	adminRouters.POST("/setting/doEdit", admin.SettingController{}.DoEdit)
 }

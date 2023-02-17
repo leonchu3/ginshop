@@ -1,6 +1,9 @@
 
 $(function () {
 	baseApp.init();
+	$(window).resize(function(){
+		baseApp.resizeIframe();
+	})
 })
 var baseApp = {
 	init: function () {
@@ -11,7 +14,8 @@ var baseApp = {
 		this.changeNum()
 	},
 	initAside: function () {
-		$('.aside h4').click(function () {
+		$('.aside>li:nth-child(1) ul,.aside>li:nth-child(2) ul').hide()
+		$('.aside h4').click(function () {			
 			$(this).siblings('ul').slideToggle();
 		})
 	},
@@ -87,7 +91,7 @@ var baseApp = {
 			//4、让input获取焦点  给input赋值    $(input).trigger('focus').val(val);
 			$(input).trigger("focus").val(num);
 			//5、点击input的时候阻止冒泡 
-			$(input).click(function (e) { 
+			$(input).click(function (e) {
 				e.stopPropagation();
 			})
 			//6、鼠标离开的时候给span赋值,并触发ajax请求

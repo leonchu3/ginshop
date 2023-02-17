@@ -4,10 +4,14 @@ import (
 	"crypto/md5"
 	"errors"
 	"fmt"
+	. "ginshop/models/go_image"
+	"html/template"
 	"io"
 	"os"
 	"path"
+	"reflect"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -15,6 +19,10 @@ import (
 
 func GetUnix() int64 {
 	return time.Now().Unix()
+}
+
+func GetUnixNano() int64 {
+	return time.Now().UnixNano()
 }
 
 func GetData() string {
@@ -41,10 +49,60 @@ func Int(str string) (int, error) {
 	return n, err
 }
 
-// string转int
+// int转string
 func String(num int) string {
 	n := strconv.Itoa(num)
 	return n
+}
+
+func Sub(a int, b int) int {
+	return a - b
+}
+
+// 把字符串解析成html
+func Str2Html(str string) template.HTML {
+	return template.HTML(str)
+}
+
+// 通过列获取值 (反射)
+func GetSettingFromColumn(columnName string) string {
+	//redis file
+	setting := Setting{}
+	DB.First(&setting)
+	//反射来获取
+	v := reflect.ValueOf(setting)
+	val := v.FieldByName(columnName).String()
+	return val
+}
+
+func Float(str string) (float64, error) {
+	n, err := strconv.ParseFloat(str, 64)
+	return n, err
+}
+
+// Substr截取字符串
+func Substr(str string, start int, end int) string {
+	rs := []rune(str)
+	rl := len(rs)
+	if start < 0 {
+		start = 0
+	}
+	if start > rl {
+		start = 0
+	}
+
+	if end < 0 {
+		end = rl
+	}
+	if end > rl {
+		end = rl
+	}
+	if start > end {
+		start, end = end, start
+	}
+
+	return string(rs[start:end])
+
 }
 
 func UploadImg(c *gin.Context, picName string) (string, error) {
@@ -73,9 +131,28 @@ func UploadImg(c *gin.Context, picName string) (string, error) {
 		fmt.Println(err1)
 		return "", err1
 	}
-	fileName := strconv.FormatInt(GetUnix(), 10) + extName //10表示十进制
+	fileName := strconv.FormatInt(GetUnixNano(), 10) + extName //10表示十进制
 
 	dst := path.Join(dir, fileName)
 	c.SaveUploadedFile(file, dst)
 	return dst, nil
+}
+
+// 生成商品缩略图
+func ResizeGoodsImage(filename string) {
+	extname := path.Ext(filename)
+	ThumbnailSize := strings.ReplaceAll(GetSettingFromColumn("ThumbnailSize"), "，", ",")
+
+	thumbnailSizeSlice := strings.Split(ThumbnailSize, ",")
+	//static/upload/tao_400.png
+	//static/upload/tao_400.png_100x100.png
+	for i := 0; i < len(thumbnailSizeSlice); i++ {
+		savepath := filename + "_" + thumbnailSizeSlice[i] + "x" + thumbnailSizeSlice[i] + extname
+		w, _ := Int(thumbnailSizeSlice[i])
+		err := ThumbnailF2F(filename, savepath, w, w)
+		if err != nil {
+			fmt.Println(err) //写个日志模块  处理日志
+		}
+	}
+
 }

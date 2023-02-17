@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"ginshop/models"
 	"ginshop/routers"
 	"text/template"
 	"time"
@@ -57,6 +58,9 @@ func main() {
 	r.SetFuncMap(template.FuncMap{
 		"UnixToTime": UnixToTime,
 		"Println":    Println,
+		"Str2Html":   models.Str2Html,
+		"Sub":        models.Sub,
+		"Substr":     models.Substr,
 	})
 
 	r.LoadHTMLGlob("templates/**/**/*")
