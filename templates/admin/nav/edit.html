@@ -12,6 +12,7 @@
             <form action="/admin/nav/doEdit" method="post">
                 <ul>
                     <input type="hidden" name="id" value="{{.nav.Id}}" />
+                    <input type="hidden" name="prevPage" class="input" value="{{.prevPage}}" />
                     <li> <span>导航名称:</span> <input type="text" name="title" value="{{.nav.Title}}" /></li>
 
                     <li> <span>导航位置: </span>

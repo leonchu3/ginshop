@@ -1,7 +1,6 @@
 package admin
 
 import (
-	"fmt"
 	"ginshop/models"
 	"net/http"
 
@@ -14,21 +13,20 @@ type GoodsCateController struct {
 
 func (con GoodsCateController) Index(c *gin.Context) {
 	goodsCateList := []models.GoodsCate{}
-	models.DB.Where("pid=0").Preload("GoodsCateItems").Find(&goodsCateList)
+	models.DB.Where("pid = 0").Preload("GoodsCateItems").Find(&goodsCateList)
+	// fmt.Printf("%#v", goodsCateList)
 	c.HTML(http.StatusOK, "admin/goodsCate/index.html", gin.H{
 		"goodsCateList": goodsCateList,
 	})
 }
-
 func (con GoodsCateController) Add(c *gin.Context) {
 	//获取顶级分类
 	goodsCateList := []models.GoodsCate{}
-	models.DB.Where("pid=0").Find(&goodsCateList)
+	models.DB.Where("pid = 0").Find(&goodsCateList)
 	c.HTML(http.StatusOK, "admin/goodsCate/add.html", gin.H{
 		"goodsCateList": goodsCateList,
 	})
 }
-
 func (con GoodsCateController) DoAdd(c *gin.Context) {
 	title := c.PostForm("title")
 	pid, err1 := models.Int(c.PostForm("pid"))
@@ -68,10 +66,10 @@ func (con GoodsCateController) DoAdd(c *gin.Context) {
 		return
 	}
 	con.Success(c, "增加数据成功", "/admin/goodsCate")
-
 }
 
 func (con GoodsCateController) Edit(c *gin.Context) {
+
 	//获取要修改的数据
 	id, err := models.Int(c.Query("id"))
 	if err != nil {
@@ -80,18 +78,17 @@ func (con GoodsCateController) Edit(c *gin.Context) {
 	}
 	goodsCate := models.GoodsCate{Id: id}
 	models.DB.Find(&goodsCate)
-	fmt.Printf("%#v", goodsCate)
+
 	//获取顶级分类
 	goodsCateList := []models.GoodsCate{}
-	models.DB.Where("pid=0").Find(&goodsCateList)
+	models.DB.Where("pid = 0").Find(&goodsCateList)
 	c.HTML(http.StatusOK, "admin/goodsCate/edit.html", gin.H{
 		"goodsCate":     goodsCate,
 		"goodsCateList": goodsCateList,
 	})
-}
 
+}
 func (con GoodsCateController) DoEdit(c *gin.Context) {
-	//获取要修改的数据
 	id, err1 := models.Int(c.PostForm("id"))
 	title := c.PostForm("title")
 	pid, err2 := models.Int(c.PostForm("pid"))
@@ -124,12 +121,10 @@ func (con GoodsCateController) DoEdit(c *gin.Context) {
 	goodsCate.Description = description
 	goodsCate.Sort = sort
 	goodsCate.Status = status
-
 	if cateImgDir != "" {
 		goodsCate.CateImg = cateImgDir
 	}
 	err := models.DB.Save(&goodsCate).Error
-
 	if err != nil {
 		con.Error(c, "修改失败", "/admin/goodsCate/edit?id="+models.String(id))
 		return
@@ -137,7 +132,6 @@ func (con GoodsCateController) DoEdit(c *gin.Context) {
 	con.Success(c, "修改成功", "/admin/goodsCate")
 
 }
-
 func (con GoodsCateController) Delete(c *gin.Context) {
 	id, err := models.Int(c.Query("id"))
 	if err != nil {

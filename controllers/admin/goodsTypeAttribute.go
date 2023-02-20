@@ -16,37 +16,36 @@ func (con GoodsTypeAttributeController) Index(c *gin.Context) {
 
 	cateId, err := models.Int(c.Query("id"))
 	if err != nil {
-		con.Error(c, "传入数据参数不正确", "/admin/goodsType")
+		con.Error(c, "传入的参数不正确", "/admin/goodsType")
 		return
 	}
-
 	//获取商品类型属性
 	goodsTypeAttributeList := []models.GoodsTypeAttribute{}
 	models.DB.Where("cate_id=?", cateId).Find(&goodsTypeAttributeList)
-
 	//获取商品类型属性对应的类型
 
 	goodsType := models.GoodsType{}
 	models.DB.Where("id=?", cateId).Find(&goodsType)
+
 	c.HTML(http.StatusOK, "admin/goodsTypeAttribute/index.html", gin.H{
 		"cateId":                 cateId,
 		"goodsTypeAttributeList": goodsTypeAttributeList,
 		"goodsType":              goodsType,
 	})
-}
 
+}
 func (con GoodsTypeAttributeController) Add(c *gin.Context) {
 	//获取当前商品类型属性对应的类型id
+
 	cateId, err := models.Int(c.Query("cate_id"))
 	if err != nil {
-		con.Error(c, "传入数据参数不正确", "/admin/goodsType")
+		con.Error(c, "传入的参数不正确", "/admin/goodsType")
 		return
 	}
 
 	//获取所有的商品类型
 	goodsTypeList := []models.GoodsType{}
 	models.DB.Find(&goodsTypeList)
-
 	c.HTML(http.StatusOK, "admin/goodsTypeAttribute/add.html", gin.H{
 		"goodsTypeList": goodsTypeList,
 		"cateId":        cateId,
@@ -74,6 +73,7 @@ func (con GoodsTypeAttributeController) DoAdd(c *gin.Context) {
 		con.Error(c, "排序值不对", "/admin/goodsTypeAttribute/add?cate_id="+models.String(cateId))
 		return
 	}
+
 	goodsTypeAttr := models.GoodsTypeAttribute{
 		Title:     title,
 		CateId:    cateId,
@@ -83,26 +83,28 @@ func (con GoodsTypeAttributeController) DoAdd(c *gin.Context) {
 		Sort:      sort,
 		AddTime:   int(models.GetUnix()),
 	}
-
 	err := models.DB.Create(&goodsTypeAttr).Error
 	if err != nil {
 		con.Error(c, "增加商品类型属性失败 请重试", "/admin/goodsTypeAttribute/add?cate_id="+models.String(cateId))
 	} else {
 		con.Success(c, "增加商品类型属性成功", "/admin/goodsTypeAttribute?id="+models.String(cateId))
 	}
+
 }
 
 func (con GoodsTypeAttributeController) Edit(c *gin.Context) {
+
 	//获取当前要修改数据的id
 	id, err := models.Int(c.Query("id"))
 	if err != nil {
-		con.Error(c, "传入数据参数不正确", "/admin/goodsType")
+		con.Error(c, "传入的参数不正确", "/admin/goodsType")
 		return
 	}
-	//获取当前id对应的商品属性
+	//获取当前id对应的商品类型属性
 	goodsTypeAttribute := models.GoodsTypeAttribute{Id: id}
 	models.DB.Find(&goodsTypeAttribute)
 
+	//获取所有的商品类型
 	goodsTypeList := []models.GoodsType{}
 	models.DB.Find(&goodsTypeList)
 

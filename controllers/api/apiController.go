@@ -1,21 +1,15 @@
 package api
 
-import (
-	"net/http"
-
-	"github.com/gin-gonic/gin"
-)
+import "github.com/gin-gonic/gin"
 
 type ApiController struct{}
 
 func (con ApiController) Index(c *gin.Context) {
-	c.String(http.StatusOK, "我是一个api接口--")
+	c.String(200, "我是一个api接口")
 }
-
 func (con ApiController) Userlist(c *gin.Context) {
-	c.String(http.StatusOK, "我是一个api接口--userlist")
+	c.String(200, "我是一个api接口-Userlist")
 }
-
 func (con ApiController) Plist(c *gin.Context) {
-	c.String(http.StatusOK, "我是一个api接口--plist")
+	c.String(200, "我是一个api接口-Plist")
 }

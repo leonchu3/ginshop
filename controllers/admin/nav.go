@@ -13,12 +13,12 @@ type NavController struct {
 }
 
 func (con NavController) Index(c *gin.Context) {
-
 	//当前页
 	page, _ := models.Int(c.Query("page"))
 	if page == 0 {
 		page = 1
 	}
+	// fmt.Println(page)
 	//每页显示的数量
 	pageSize := 8
 	//获取数据
@@ -35,13 +35,10 @@ func (con NavController) Index(c *gin.Context) {
 		"page":       page,
 	})
 }
-
 func (con NavController) Add(c *gin.Context) {
 	c.HTML(http.StatusOK, "admin/nav/add.html", gin.H{})
 }
-
 func (con NavController) DoAdd(c *gin.Context) {
-
 	title := c.PostForm("title")
 	link := c.PostForm("link")
 	position, _ := models.Int(c.PostForm("position"))
@@ -53,6 +50,7 @@ func (con NavController) DoAdd(c *gin.Context) {
 		con.Error(c, "标题不能为空", "/admin/nav/add")
 		return
 	}
+
 	nav := models.Nav{
 		Title:     title,
 		Link:      link,
@@ -71,14 +69,30 @@ func (con NavController) DoAdd(c *gin.Context) {
 	}
 
 }
+func (con NavController) Edit(c *gin.Context) {
+	id, err := models.Int(c.Query("id"))
+	if err != nil {
+		con.Error(c, "传入数据错误", "/admin/nav")
+	} else {
+		nav := models.Nav{Id: id}
+		models.DB.Find(&nav)
+		// fmt.Println(nav)
+		c.HTML(http.StatusOK, "admin/nav/edit.html", gin.H{
+			"nav":      nav,
+			"prevPage": c.Request.Referer(), //获取上一页的地址
+		})
+	}
 
+}
 func (con NavController) DoEdit(c *gin.Context) {
+
 	id, err1 := models.Int(c.PostForm("id"))
 	if err1 != nil {
 		con.Error(c, "传入数据错误", "/admin/nav")
 		return
 	}
-
+	//获取上一页的地址
+	prevPage := c.PostForm("prevPage")
 	title := c.PostForm("title")
 	link := c.PostForm("link")
 	position, _ := models.Int(c.PostForm("position"))
@@ -104,24 +118,14 @@ func (con NavController) DoEdit(c *gin.Context) {
 	if err2 != nil {
 		con.Error(c, "修改数据失败", "/admin/nav/edit?id="+models.String(id))
 	} else {
-		con.Success(c, "修改数据成功", "/admin/nav")
+		if len(prevPage) > 0 {
+			con.Success(c, "修改数据成功", prevPage)
+		} else {
+			con.Success(c, "修改数据成功", "/admin/nav")
+		}
 	}
+
 }
-
-func (con NavController) Edit(c *gin.Context) {
-
-	id, err := models.Int(c.Query("id")) //query获得的是url里的参数
-	if err != nil {
-		con.Error(c, "传入数据错误", "/admin/nav")
-	} else {
-		nav := models.Nav{Id: id}
-		models.DB.Find(&nav)
-		c.HTML(http.StatusOK, "admin/nav/edit.html", gin.H{
-			"nav": nav,
-		})
-	}
-}
-
 func (con NavController) Delete(c *gin.Context) {
 	id, err := models.Int(c.Query("id"))
 	if err != nil {
@@ -129,6 +133,12 @@ func (con NavController) Delete(c *gin.Context) {
 	} else {
 		nav := models.Nav{Id: id}
 		models.DB.Delete(&nav)
-		con.Success(c, "删除数据成功", "/admin/nav")
+		//获取上一页
+		prevPage := c.Request.Referer()
+		if len(prevPage) > 0 {
+			con.Success(c, "删除数据成功", prevPage)
+		} else {
+			con.Success(c, "删除数据成功", "/admin/nav")
+		}
 	}
 }

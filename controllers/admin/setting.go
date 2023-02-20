@@ -23,15 +23,14 @@ func (con SettingController) Index(c *gin.Context) {
 func (con SettingController) DoEdit(c *gin.Context) {
 	setting := models.Setting{Id: 1}
 	models.DB.Find(&setting)
-
 	if err := c.ShouldBind(&setting); err != nil {
 		fmt.Println(err)
-
 		con.Error(c, "修改数据失败,请重试", "/admin/setting")
 		return
 	} else {
 		// 上传图片 logo
 		siteLogo, err1 := models.UploadImg(c, "site_logo")
+		// fmt.Println(siteLogo)
 		if len(siteLogo) > 0 && err1 == nil {
 			setting.SiteLogo = siteLogo
 		}
@@ -46,7 +45,6 @@ func (con SettingController) DoEdit(c *gin.Context) {
 			con.Error(c, "修改数据失败", "/admin/setting")
 			return
 		}
-
 		con.Success(c, "修改数据成功", "/admin/setting")
 	}
 }
